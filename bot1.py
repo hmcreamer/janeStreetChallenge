@@ -104,10 +104,10 @@ def convert_position(exchange, orderId, symbol, size, direction):
 
 def update_market_price():
     for symbol in trades.keys():
-        market_price[symbol] = sum.trades[symbol]/5.0
+        market_price[symbol] = sum(trades[symbol])/5.0
     market_price["BOND"] = 1000
     market_price["EXBABA"] = market_price["BABZ"]
-    market_price["EXXLK"] = ((3 * market_price["BOND"]) + (2 * market_price["APPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
+    market_price["EXXLK"] = ((3 * market_price["BOND"]) + (2 * market_price["AAPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
 
 
 def buysell(exchange, symbol, wait_time):
@@ -119,7 +119,7 @@ def buysell(exchange, symbol, wait_time):
                 to_sell = amount_wanted
             else:
                 to_sell = amount_possible
-            sell_position(exchange, wait_time, symbol, sell[0], to_sell)
+            sell_position(exchange, wait_time, symbol, sell[0] - 1.5, to_sell)
             our_current_positions[symbol] -= to_sell
 
     for buy in book[symbol]["buy"]:
@@ -131,7 +131,7 @@ def buysell(exchange, symbol, wait_time):
             else:
                 to_buy = amount_possible
 
-            buy_position(exchange, wait_time*2, symbol, buy[0], to_buy)
+            buy_position(exchange, wait_time*2, symbol, buy[0]+ 1.5, to_buy)
             our_current_positions[symbol] += to_buy
 
 def exchange(exchange, wait_time):
