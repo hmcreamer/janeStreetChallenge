@@ -54,7 +54,7 @@ book = {"BOND": {}, "AAPL": {}, "MSFT": {}, "GOOG": {}, "XLK": {}, "BABA": {}, "
 
 trades = {"BOND": [], "AAPL": [], "MSFT": [], "GOOG": [], "XLK": [], "BABA": [], "BABZ": []}
 
-market_price = {"BOND": 1000, "AAPL": float('inf'), "MSFT": float('inf'), "GOOG": float('inf'), "XLK": float('inf'), "BABA": float('inf'), "BABZ": float('inf')}
+market_price = {"BOND": 1000, "AAPL": float('inf'), "MSFT": float('inf'), "GOOG": float('inf'), "XLK": float('inf'), "BABA": float('inf'), "BABZ": float('inf'), "EXXLK": float("inf")}
 
 def read_message(message):
     if (message["type"] == str(book)):
@@ -90,29 +90,13 @@ def read_message(message):
 def buy_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "BUY", "price": price, "size": size})
     replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_buy_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
 
 def sell_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
     replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_sell_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
 
 def convert_position(exchange, orderId, symbol, size, direction):
     write_to_exchange(exchange, {"type": "convert", "order_id": orderId, "symbol": symbol, direction: "BUY", "size": size})
-    replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_sell_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
 
 
 
@@ -125,7 +109,7 @@ def update_market_price():
     market_price["EXXLK"] = ((3 * market_price["BOND"]) + (2 * market_price["APPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
 
 
-def buysell(symbol):
+def buysell(exchange, symbol):
     for sell in book[symbol]["sell"]:
         if (sell < market_price[symbol]):
             amount_wanted = sell[1]
@@ -134,7 +118,7 @@ def buysell(symbol):
                 to_sell = amount_wanted
             else:
                 to_sell = amount_possible
-            sell_position(symbol, 0, sell[0], to_sell)
+            sell_position(exchange, 0, symbol, sell[0], to_sell)
             our_current_positions[symbol] -= to_sell
 
     for buy in book[symbol]["buy"]:
@@ -146,16 +130,15 @@ def buysell(symbol):
             else:
                 to_buy = amount_possible
 
-            buy_position(symbol, 0, buy[0], to_buy)
+            buy_position(exchange, 0, symbol, buy[0], to_buy)
             our_current_positions[symbol] += to_buy
 
-def exchange():
+def exchange(exchange):
     if ((market_price["BABA"] * our_current_positions["BABA"]) + 10 < (market_price["BABZ"] * our_current_positions["BABA"])):
-        pass
+        convert_position(exchange, 0, "BABA", our_current_positions["BABA"], "SELL")
 
-
-    if (market_price["XLK"] * our_current_positions["XLK"] < market_price["EXXLK"] * our_current_positions["LKX"]):
-        pass
+    if (market_price["XLK"] * our_current_positions["XLK"] + 100 < market_price["EXXLK"] * our_current_positions["LKX"]):
+        convert_position(exchange, 0, "XLK", our_current_positions["XLK"], "SELL")
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
