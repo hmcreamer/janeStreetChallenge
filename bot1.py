@@ -153,10 +153,13 @@ def main(wait_time, exchange):
     # We need to read the messages and do stuff accordingly
 
     messages = read_from_exchange(exchange)
-    print("string messages: ")
-    print(messages)
-
+    #print("string messages: ")
+    #print(messages)
+    read_message(messages)
     update_market_price()
+    for symbol in market_price.keys():
+        buysell(exchange, symbol)
+    exchange(exchange)
 
     # At end of loop, we want to:
     # 1. clear all of our dictionaries
