@@ -103,9 +103,6 @@ def buy_position(exchange, orderId, symbol, price, size):
 def sell_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
 
-def sell_position(exchange, orderId, symbol, price, size):
-    write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
-
 def convert_position(exchange, orderId, symbol, size, direction):
     write_to_exchange(exchange, {"type": "convert", "order_id": orderId, "symbol": symbol, direction: "BUY", "size": size})
 
