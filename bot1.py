@@ -84,29 +84,40 @@ def sell_position(exchange, orderId, symbol, price, size):
     else:
         return False
 
+def update_market_price():
+    for symbol in trades.keys():
+        market_price[symbol] = sum.trades[symbol]/5.0
+    market_price["BOND"] = 1000
+    market_price["BABA"] = market_price["BABZ"]
+    market_price["EKXEX"] = ((3 * market_price["BOND"]) + (2 * market_price["APPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
 
 
-def exchange(symbol):
+def buysell(symbol):
     for sell in book[symbol]["sell"]:
         if (sell < market_price[symbol]):
             amount_wanted = sell[1]
-            amount_possible = our_current_positions[symbol]["amount"]
+            amount_possible = our_current_positions[symbol]
             if (amount_wanted <= amount_possible):
                 to_sell = amount_wanted
             else:
                 to_sell = amount_possible
-            sell_position(symbol, orderId, sell[0], to_sell)
+            sell_position(symbol, 0, sell[0], to_sell)
+            our_current_positions[symbol] -= to_sell
 
     for buy in book[symbol]["buy"]:
         if (buy > market_price[symbol]):
             amount_offered = buy[1]
-            amount_possible = 100 - our_current_positions[symbol]["amount"]
+            amount_possible = 100 - our_current_positions[symbol]
             if (amount_offered <= amount_possible):
                 to_buy = amount_offered
             else:
                 to_buy = amount_possible
 
-            buy_position(symbol, orderId, buy[0], to_buy)
+            buy_position(symbol, 0, buy[0], to_buy)
+            our_current_positions[symbol] += to_buy
+
+def exchange(symbol):
+    pass
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -124,6 +135,7 @@ def main(wait_time, exchange):
     print("string messages: ")
     print(messages)
 
+    update_market_price()
 
     # At end of loop, we want to:
     # 1. clear all of our dictionaries
