@@ -125,6 +125,7 @@ def run_bot():
 if __name__ == "__main__":
     run_bot()
 
+
 """    
 {u'sell': [[4000, 2], [4001, 3], [4002, 11]], u'symbol': u'MSFT', u'buy': [[3996, 2], [3995, 4], [3994, 2]], u'type': u'book'}
 The exchange replied: {u'symbols': [{u'position': 0, u'symbol': u'AAPL'}, {u'position': 0, u'symbol': u'BABA'}, 
