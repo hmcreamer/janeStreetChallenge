@@ -45,7 +45,6 @@ def read_from_exchange(exchange):
 
 attempted_positions = {}
 
-
 our_current_positions = {}
 
 market_positions = {}
