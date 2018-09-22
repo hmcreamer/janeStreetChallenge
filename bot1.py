@@ -110,7 +110,7 @@ def update_market_price():
     market_price["EXXLK"] = ((3 * market_price["BOND"]) + (2 * market_price["APPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
 
 
-def buysell(exchange, symbol):
+def buysell(exchange, symbol, wait_time):
     for sell in book[symbol]["sell"]:
         if (sell < market_price[symbol]):
             amount_wanted = sell[1]
@@ -119,7 +119,7 @@ def buysell(exchange, symbol):
                 to_sell = amount_wanted
             else:
                 to_sell = amount_possible
-            sell_position(exchange, 0, symbol, sell[0], to_sell)
+            sell_position(exchange, wait_time, symbol, sell[0], to_sell)
             our_current_positions[symbol] -= to_sell
 
     for buy in book[symbol]["buy"]:
@@ -131,15 +131,15 @@ def buysell(exchange, symbol):
             else:
                 to_buy = amount_possible
 
-            buy_position(exchange, 0, symbol, buy[0], to_buy)
+            buy_position(exchange, wait_time*2, symbol, buy[0], to_buy)
             our_current_positions[symbol] += to_buy
 
-def exchange(exchange):
+def exchange(exchange, wait_time):
     if ((market_price["BABA"] * our_current_positions["BABA"]) + 10 < (market_price["BABZ"] * our_current_positions["BABA"])):
-        convert_position(exchange, 0, "BABA", our_current_positions["BABA"], "SELL")
+        convert_position(exchange, wait_time, "BABA", our_current_positions["BABA"], "SELL")
 
     if (market_price["XLK"] * our_current_positions["XLK"] + 100 < market_price["EXXLK"] * our_current_positions["LKX"]):
-        convert_position(exchange, 0, "XLK", our_current_positions["XLK"], "SELL")
+        convert_position(exchange, wait_time, "XLK", our_current_positions["XLK"], "SELL")
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -159,8 +159,8 @@ def main(wait_time, exchange):
     read_message(messages)
     update_market_price()
     for symbol in market_price.keys():
-        buysell(exchange, symbol)
-    exchange(exchange)
+        buysell(exchange, symbol, wait_time)
+    exchange(exchange, wait_time)
 
     # At end of loop, we want to:
     # 1. clear all of our dictionaries
