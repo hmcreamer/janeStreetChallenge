@@ -65,6 +65,7 @@ def main():
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 
     messages = read_from_exchange(exchange)
+    print(messages)
 
 def run_bot():
     while True:
