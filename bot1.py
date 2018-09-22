@@ -10,6 +10,7 @@ from __future__ import print_function
 import sys
 import socket
 import json
+import time
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
@@ -95,7 +96,9 @@ def main():
     # 3. reconnect to server using linux command
 
 def run_bot():
-    while True:
+    waitTime = 0
+    while waitTime <=300:
+        time.sleep(1)
         main()
         # Add logger for parsing server messges for other people's trades
 
@@ -104,4 +107,3 @@ def run_bot():
 if __name__ == "__main__":
     main()
 
-    
