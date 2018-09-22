@@ -89,30 +89,12 @@ def read_message(message):
 
 def buy_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "BUY", "price": price, "size": size})
-    replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_buy_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
 
 def sell_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
-    replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_sell_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
 
 def convert_position(exchange, orderId, symbol, size, direction):
     write_to_exchange(exchange, {"type": "convert", "order_id": orderId, "symbol": symbol, direction: "BUY", "size": size})
-    replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_sell_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
 
 
 
