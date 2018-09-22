@@ -54,5 +54,10 @@ def main():
     # exponential explosion in pending messages. Please, don't do that!
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 
+def run_bot():
+    while True:
+        main()
+
+
 if __name__ == "__main__":
     main()
