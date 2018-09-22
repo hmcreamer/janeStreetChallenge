@@ -67,6 +67,7 @@ def main():
     messages = read_from_exchange(exchange)
     print(messages)
 
+
 def run_bot():
     while True:
         main()
