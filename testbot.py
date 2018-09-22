@@ -19,7 +19,7 @@ import random
 team_name="TEAMBIGDATA"
 # This variable dictates whether or not the bot is connecting to the prod
 # or test exchange. Be careful with this switch!
-test_mode = False
+test_mode = True
 
 # This setting changes which test exchange is connected to.
 # 0 is prod-like
@@ -155,10 +155,10 @@ def buysell(exchange, symbol, wait_time):
             our_current_positions[symbol] += to_buy
 
 def converting(exchange, wait_time):
-    if ((market_price["BABA"] * our_current_positions["BABA"]) + 10 < (market_price["BABZ"] * our_current_positions["BABA"])):
+    if ((market_price["BABA"] * our_current_positions["BABA"]) + 10 > (market_price["BABZ"] * our_current_positions["BABA"])):
         convert_position(exchange, wait_time, "BABA", our_current_positions["BABA"], "SELL")
 
-    if (market_price["XLK"] * our_current_positions["XLK"] + 100 < market_price["EXXLK"] * our_current_positions["XLK"]):
+    if (market_price["XLK"] * our_current_positions["XLK"] + 100 > market_price["EXXLK"] * our_current_positions["XLK"]):
         convert_position(exchange, wait_time, "XLK", our_current_positions["XLK"], "SELL")
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
@@ -189,7 +189,7 @@ def main(wait_time, exchange):
     update_market_price()
     for symbol in market_price.keys():
         buysell(exchange, symbol, rand)
-    #converting(exchange, rand)
+    converting(exchange, rand)
 
     time.sleep(1)
 
