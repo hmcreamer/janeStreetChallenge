@@ -48,23 +48,44 @@ attempted_buy_positions = {}
 
 attempted_sell_positions = {}
 
-our_current_positions = {}
+our_current_positions = {"BOND":0, "AAPL": 0, "MSFT": 0, "GOOG": 0, "XLK": 0, "BABA": 0, "BABZ": 0}
 
 market_positions = {}
 
 book = {"BOND": {}, "AAPL": {}, "MSFT": {}, "GOOG": {}, "XLK": {}, "BABA": {}, "BABZ": {}}
 
-trades = {}
+trades = {"BOND": [], "AAPL": [], "MSFT": [], "GOOG": [], "XLK": [], "BABA": [], "BABZ": []}
 
 def read_message(message):
-    if (message[str(type) == str(book)]):
+    if (message["type"] == str(book)):
         book[message["symbol"]] = {"sell": message["sell"], "buy": message["buy"]}
-    elif (message[str(type) == 'error']):
 
-    elif (message[str(type) == "ack"]):
+    elif (message["type"] == "reject"):
+        if (message["order_id"] % 2 == 0):
+            if (attempted_buy_positions.has_key(message["order_id"])):
+                attempted_buy_positions.pop(message["order_id"])
+        else:
+            if (attempted_sell_positions.has_key(message["order_id"])):
+                attempted_sell_positions.pop(message["order_id"])
 
-    elif (message[str(type) == ""]):
+    elif message["type"] == "trade":
+        if len(trades[message["symbol"]]) < 5:
+            trades[message["symbol"]].append(message["price"])
+        else:
+            trades[message["symbol"]].pop(0)
+            trades[message["symbol"]].append(message["price"])
 
+    elif (message["type"] == "fill"):
+        if message["dir"] == "BUY":
+            our_current_positions[message["symbol"]] += message["size"]
+            attempted_sell_positions[message["order_id"]][2] -= message["size"]
+            if attempted_sell_positions[message["order_id"]][2] <= 0:
+                attempted_sell_positions.pop(message["order_id"])
+        else:
+            our_current_positions[message["symbol"]] -= message["size"]
+            attempted_sell_positions[message["order_id"]][2] -= message["size"]
+            if attempted_sell_positions[message["order_id"]][2] <= 0:
+                attempted_sell_positions.pop(message["order_id"])
 
 def buy_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "BUY", "price": price, "size": size})
