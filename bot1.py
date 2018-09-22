@@ -105,6 +105,18 @@ def sell_position(exchange, orderId, symbol, price, size):
     else:
         return False
 
+def convert_position(exchange, orderId, symbol, size, direction):
+    write_to_exchange(exchange, {"type": "convert", "order_id": orderId, "symbol": symbol, direction: "BUY", "size": size})
+    replyMessage = read_from_exchange(exchange)
+    if replyMessage["type"] != "reject":
+        attempted_sell_positions[orderId] = [symbol, price, size]
+        return True
+    else:
+        return False
+
+
+
+
 def update_market_price():
     for symbol in trades.keys():
         market_price[symbol] = sum.trades[symbol]/5.0
