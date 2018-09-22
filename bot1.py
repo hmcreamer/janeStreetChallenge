@@ -10,6 +10,7 @@ from __future__ import print_function
 import sys
 import socket
 import json
+import time
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
@@ -106,7 +107,9 @@ def run_bot():
     write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
     hello_from_exchange = read_from_exchange(exchange)
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
-    while True:
+    while waitTime <= 300:
+        waitTime = 0
+        time.sleep(1)
         main()
         # Add logger for parsing server messges for other people's trades
 
