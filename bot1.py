@@ -52,6 +52,13 @@ our_current_positions = {}
 
 market_positions = {}
 
+book = {}
+def read_message(message):
+    if (message[str(u'type') == str(u'book')]):
+
+    else:
+
+
 
 
 
@@ -79,8 +86,8 @@ def fair_price_approx(symbol):
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
-def main():
-    exchange = connect()
+def main(waitTime, exchange):
+
     # A common mistake people make is to call write_to_exchange() > 1
     # time for every read_from_exchange() response.
     # Since many write messages generate marketdata, this will cause an
@@ -88,9 +95,6 @@ def main():
 
 
     # We need to read the messages and do stuff accordingly
-
-    messages = read_from_exchange(exchange)
-    print(messages)
 
     messages = read_from_exchange(exchange)
     print("string messages: ")
@@ -107,10 +111,14 @@ def run_bot():
     write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
     hello_from_exchange = read_from_exchange(exchange)
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+
+    waitTime = 0
+
     while waitTime <= 300:
-        waitTime = 0
-        time.sleep(1)
-        main()
+        main(waitTime, exchange)
+        time.sleep(.001)
+        waitTime += .001
+
         # Add logger for parsing server messges for other people's trades
 
 
