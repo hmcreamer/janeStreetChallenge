@@ -109,8 +109,8 @@ def update_market_price():
     for symbol in trades.keys():
         market_price[symbol] = sum.trades[symbol]/5.0
     market_price["BOND"] = 1000
-    market_price["BABA"] = market_price["BABZ"]
-    market_price["EKXEX"] = ((3 * market_price["BOND"]) + (2 * market_price["APPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
+    market_price["EXBABA"] = market_price["BABZ"]
+    market_price["EXXLK"] = ((3 * market_price["BOND"]) + (2 * market_price["APPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
 
 
 def buysell(symbol):
@@ -137,8 +137,13 @@ def buysell(symbol):
             buy_position(symbol, 0, buy[0], to_buy)
             our_current_positions[symbol] += to_buy
 
-def exchange(symbol):
-    pass
+def exchange():
+    if ((market_price["BABA"] * our_current_positions["BABA"]) + 10 < (market_price["BABZ"] * our_current_positions["BABA"])):
+        pass
+
+
+    if (market_price["XLK"] * our_current_positions["XLK"] < market_price["EXXLK"] * our_current_positions["LKX"]):
+        pass
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
