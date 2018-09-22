@@ -22,7 +22,7 @@ test_mode = True
 # 0 is prod-like
 # 1 is slower
 # 2 is empty
-test_exchange_index = 2
+test_exchange_index = 0
 prod_exchange_hostname="production"
 
 port=25000 + (test_exchange_index if test_mode else 0)
@@ -46,7 +46,6 @@ def read_from_exchange(exchange):
 attempted_buy_positions = {}
 
 attempted_sell_positions = {}
-
 
 our_current_positions = {}
 
@@ -87,6 +86,8 @@ def main():
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 
     messages = read_from_exchange(exchange)
+    print(messages)
+
 
     # At end of loop, we want to:
     # 1. clear all of our dictionaries
