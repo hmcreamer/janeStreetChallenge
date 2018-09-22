@@ -41,6 +41,20 @@ def write_to_exchange(exchange, obj):
 def read_from_exchange(exchange):
     return json.loads(exchange.readline())
 
+# sub functions and global vars
+
+attempted_positions = {}
+
+our_current_positions = {}
+
+market_positions = {}
+
+
+
+
+
+
+
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -53,6 +67,9 @@ def main():
     # Since many write messages generate marketdata, this will cause an
     # exponential explosion in pending messages. Please, don't do that!
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+
+    messages = read_from_exchange(exchange)
+
 
 if __name__ == "__main__":
     main()
