@@ -52,14 +52,18 @@ our_current_positions = {}
 
 market_positions = {}
 
-book = {}
+book = {"BOND": {}, "AAPL": {}, "MSFT": {}, "GOOG": {}, "XLK": {}, "BABA": {}, "BABZ": {}}
+
+trades = {}
+
 def read_message(message):
-    if (message[str(u'type') == str(u'book')]):
+    if (message[str(type) == str(book)]):
+        book[message["symbol"]] = {"sell": message["sell"], "buy": message["buy"]}
+    elif (message[str(type) == 'error']):
 
-    else:
+    elif (message[str(type) == "ack"]):
 
-
-
+    elif (message[str(type) == ""]):
 
 
 def buy_position(exchange, orderId, symbol, price, size):
