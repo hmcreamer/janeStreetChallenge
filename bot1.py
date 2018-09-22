@@ -88,6 +88,11 @@ def main():
     messages = read_from_exchange(exchange)
     print(messages)
 
+    buy_position(exchange, 1, "BOND", 1000, 4)
+
+    messages = read_from_exchange(exchange)
+    print(messages)
+
 
     # At end of loop, we want to:
     # 1. clear all of our dictionaries
