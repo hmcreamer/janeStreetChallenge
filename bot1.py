@@ -51,7 +51,16 @@ attempted_sell_positions = {}
 
 our_current_positions = {"BOND":0, "AAPL": 0, "MSFT": 0, "GOOG": 0, "XLK": 0, "BABA": 0, "BABZ": 0}
 
-book = {"BOND": defaultdict, "AAPL": defaultdict, "MSFT": defaultdict, "GOOG": defaultdict, "XLK": defaultdict, "BABA": defaultdict, "BABZ": defaultdict}
+book = {"BOND": {"sell": [], "buy": []},
+        "AAPL": {"sell": [], "buy": []},
+        "MSFT": {"sell": [], "buy": []},
+        "GOOG": {"sell": [], "buy": []},
+        "XLK": {"sell": [], "buy": []},
+        "BABA": {"sell": [], "buy": []},
+        "BABZ": {"sell": [], "buy": []},
+        "EXXLK": {"sell": [], "buy": []},
+        "EXBABA": {"sell": [], "buy": []},
+        }
 
 trades = {"BOND": [], "AAPL": [], "MSFT": [], "GOOG": [], "XLK": [], "BABA": [], "BABZ": []}
 
