@@ -10,7 +10,6 @@ from __future__ import print_function
 import sys
 import socket
 import json
-import pandas as pd
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
@@ -74,20 +73,18 @@ def sell_position(exchange, orderId, symbol, price, size):
         return False
 
 
-def fair_price_approx(symbol, )
+def fair_price_approx(symbol):
     pass
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
 def main():
     exchange = connect()
-    write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
-    hello_from_exchange = read_from_exchange(exchange)
     # A common mistake people make is to call write_to_exchange() > 1
     # time for every read_from_exchange() response.
     # Since many write messages generate marketdata, this will cause an
     # exponential explosion in pending messages. Please, don't do that!
-    print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+
 
     # We need to read the messages and do stuff accordingly
 
@@ -105,6 +102,10 @@ def main():
     # 3. reconnect to server using linux command
 
 def run_bot():
+    exchange = connect()
+    write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
+    hello_from_exchange = read_from_exchange(exchange)
+    print("The exchange replied:", hello_from_exchange, file=sys.stderr)
     while True:
         main()
         # Add logger for parsing server messges for other people's trades
@@ -114,4 +115,11 @@ def run_bot():
 if __name__ == "__main__":
     run_bot()
 
-    
+"""    
+{u'sell': [[4000, 2], [4001, 3], [4002, 11]], u'symbol': u'MSFT', u'buy': [[3996, 2], [3995, 4], [3994, 2]], u'type': u'book'}
+The exchange replied: {u'symbols': [{u'position': 0, u'symbol': u'AAPL'}, {u'position': 0, u'symbol': u'BABA'}, 
+{u'position': 0, u'symbol': u'BABZ'}, {u'position': 0, u'symbol': u'BOND'}, {u'position': 0, u'symbol': u'GOOG'}, 
+{u'position': 0, u'symbol': u'MSFT'}, {u'position': 0, u'symbol': u'USD'}, 
+{u'position': 0, u'symbol': u'XLK'}], u'type': u'hello'}
+{u'symbols': [u'AAPL', u'BABA', u'BABZ', u'BOND', u'GOOG', u'MSFT', u'XLK'], u'type': u'open'}
+"""
