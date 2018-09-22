@@ -70,6 +70,10 @@ def main():
 
     messages = read_from_exchange(exchange)
 
+def run_bot():
+    while True:
+        main()
+
 
 if __name__ == "__main__":
     main()
