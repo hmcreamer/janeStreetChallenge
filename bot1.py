@@ -11,6 +11,7 @@ import sys
 import socket
 import json
 import time
+from collections import defaultdict
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
@@ -50,7 +51,7 @@ attempted_sell_positions = {}
 
 our_current_positions = {"BOND":0, "AAPL": 0, "MSFT": 0, "GOOG": 0, "XLK": 0, "BABA": 0, "BABZ": 0}
 
-book = {"BOND": {}, "AAPL": {}, "MSFT": {}, "GOOG": {}, "XLK": {}, "BABA": {}, "BABZ": {}}
+book = {"BOND": defaultdict, "AAPL": defaultdict, "MSFT": defaultdict, "GOOG": defaultdict, "XLK": defaultdict, "BABA": defaultdict, "BABZ": defaultdict}
 
 trades = {"BOND": [], "AAPL": [], "MSFT": [], "GOOG": [], "XLK": [], "BABA": [], "BABZ": []}
 
