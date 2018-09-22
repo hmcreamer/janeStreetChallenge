@@ -50,11 +50,11 @@ attempted_sell_positions = {}
 
 our_current_positions = {}
 
-market_positions = {}
-
 book = {"BOND": {}, "AAPL": {}, "MSFT": {}, "GOOG": {}, "XLK": {}, "BABA": {}, "BABZ": {}}
 
 trades = {}
+
+market_price = {"BOND": 1000, "AAPL": float('inf'), "MSFT": float('inf'), "GOOG": float('inf'), "XLK": float('inf'), "BABA": float('inf'), "BABZ": float('inf')}
 
 def read_message(message):
     if (message[str(type) == str(book)]):
@@ -85,8 +85,28 @@ def sell_position(exchange, orderId, symbol, price, size):
         return False
 
 
-def fair_price_approx(symbol):
-    pass
+
+def exchange(symbol):
+    for sell in book[symbol]["sell"]:
+        if (sell < market_price[symbol]):
+            amount_wanted = sell[1]
+            amount_possible = our_current_positions[symbol]["amount"]
+            if (amount_wanted <= amount_possible):
+                to_sell = amount_wanted
+            else:
+                to_sell = amount_possible
+            sell_position(symbol, orderId, sell[0], to_sell)
+
+    for buy in book[symbol]["buy"]:
+        if (buy > market_price[symbol]):
+            amount_offered = buy[1]
+            amount_possible = 100 - our_current_positions[symbol]["amount"]
+            if (amount_offered <= amount_possible):
+                to_buy = amount_offered
+            else:
+                to_buy = amount_possible
+
+            buy_position(symbol, orderId, buy[0], to_buy)
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
