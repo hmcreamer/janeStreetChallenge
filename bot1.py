@@ -12,6 +12,7 @@ import socket
 import json
 import time
 from collections import defaultdict
+import random
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
@@ -29,6 +30,8 @@ prod_exchange_hostname="production"
 
 port=25000 + (test_exchange_index if test_mode else 0)
 exchange_hostname = "test-exch-" + team_name if test_mode else prod_exchange_hostname
+
+order_idxxx = 1
 
 # ~~~~~============== NETWORKING CODE ==============~~~~~
 def connect():
@@ -67,8 +70,13 @@ trades = {"BOND": [], "AAPL": [], "MSFT": [], "GOOG": [], "XLK": [], "BABA": [],
 market_price = {"BOND": 1000, "AAPL": float('inf'), "MSFT": float('inf'), "GOOG": float('inf'), "XLK": float('inf'), "BABA": float('inf'), "BABZ": float('inf'), "EXXLK": float("inf")}
 
 def read_message(message):
-    if (message["type"] == str(book)):
+    if (message["type"] == "book"):
+        #print("in book")
+        #print(message["sell"])
+        #print(message["buy"])
         book[message["symbol"]] = {"sell": message["sell"], "buy": message["buy"]}
+        #print(book)
+
 
     elif (message["type"] == "reject"):
         if (message["order_id"] % 2 == 0):
@@ -81,6 +89,7 @@ def read_message(message):
     elif message["type"] == "trade":
         if len(trades[message["symbol"]]) < 5:
             trades[message["symbol"]].append(message["price"])
+            #print("added")
         else:
             trades[message["symbol"]].pop(0)
             trades[message["symbol"]].append(message["price"])
@@ -88,9 +97,9 @@ def read_message(message):
     elif (message["type"] == "fill"):
         if message["dir"] == "BUY":
             our_current_positions[message["symbol"]] += message["size"]
-            attempted_sell_positions[message["order_id"]][2] -= message["size"]
-            if attempted_sell_positions[message["order_id"]][2] <= 0:
-                attempted_sell_positions.pop(message["order_id"])
+            # attempted_sell_positions[message["order_id"]][2] -= message["size"]
+            # if attempted_sell_positions[message["order_id"]][2] <= 0:
+            #     attempted_sell_positions.pop(message["order_id"])
         else:
             our_current_positions[message["symbol"]] -= message["size"]
             attempted_sell_positions[message["order_id"]][2] -= message["size"]
@@ -99,22 +108,21 @@ def read_message(message):
 
 def buy_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "BUY", "price": price, "size": size})
+    attempted_buy_positions[orderId] = [symbol, price, size]
+
 
 def sell_position(exchange, orderId, symbol, price, size):
     write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
-
-def sell_position(exchange, orderId, symbol, price, size):
-    write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
+    attempted_sell_positions[orderId] = [symbol, price, size]
 
 def convert_position(exchange, orderId, symbol, size, direction):
     write_to_exchange(exchange, {"type": "convert", "order_id": orderId, "symbol": symbol, direction: "BUY", "size": size})
 
 
 
-
 def update_market_price():
     for symbol in trades.keys():
-        market_price[symbol] = sum(trades[symbol])/5.0
+        market_price[symbol] = sum(trades[symbol])/float(len(trades[symbol])+ .00000001)
     market_price["BOND"] = 1000
     market_price["EXBABA"] = market_price["BABZ"]
     market_price["EXXLK"] = ((3 * market_price["BOND"]) + (2 * market_price["AAPL"]) + (3 * market_price["MSFT"]) + (2 * market_price["GOOG"]))/10.0
@@ -122,18 +130,20 @@ def update_market_price():
 
 def buysell(exchange, symbol, wait_time):
     for sell in book[symbol]["sell"]:
-        if (sell < market_price[symbol]):
+        if (sell < market_price[symbol] + 1):
+            print("sell")
             amount_wanted = sell[1]
             amount_possible = our_current_positions[symbol]
             if (amount_wanted <= amount_possible):
                 to_sell = amount_wanted
             else:
                 to_sell = amount_possible
-            sell_position(exchange, wait_time, symbol, sell[0] - 1.5, to_sell)
+            sell_position(exchange, wait_time, symbol, sell[0] - 1, to_sell)
             our_current_positions[symbol] -= to_sell
 
     for buy in book[symbol]["buy"]:
         if (buy > market_price[symbol]):
+            print("buy")
             amount_offered = buy[1]
             amount_possible = 100 - our_current_positions[symbol]
             if (amount_offered <= amount_possible):
@@ -141,14 +151,14 @@ def buysell(exchange, symbol, wait_time):
             else:
                 to_buy = amount_possible
 
-            buy_position(exchange, wait_time*2, symbol, buy[0]+ 1.5, to_buy)
+            buy_position(exchange, wait_time*2, symbol, buy[0], to_buy)
             our_current_positions[symbol] += to_buy
 
-def exchange(exchange, wait_time):
+def converting(exchange, wait_time):
     if ((market_price["BABA"] * our_current_positions["BABA"]) + 10 < (market_price["BABZ"] * our_current_positions["BABA"])):
         convert_position(exchange, wait_time, "BABA", our_current_positions["BABA"], "SELL")
 
-    if (market_price["XLK"] * our_current_positions["XLK"] + 100 < market_price["EXXLK"] * our_current_positions["LKX"]):
+    if (market_price["XLK"] * our_current_positions["XLK"] + 100 < market_price["EXXLK"] * our_current_positions["XLK"]):
         convert_position(exchange, wait_time, "XLK", our_current_positions["XLK"], "SELL")
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
@@ -162,15 +172,26 @@ def main(wait_time, exchange):
 
 
     # We need to read the messages and do stuff accordingly
-
+    rand = random.randint(0,100000000)
     messages = read_from_exchange(exchange)
     #print("string messages: ")
-    #print(messages)
+    if (messages["type"] == "trade"):
+        #print(messages)
+        #print("market_price")
+        #print(market_price)
+        #print("trades")
+        #print(trades)
+        #print("book")
+        #print(book)
+        pass
+
     read_message(messages)
     update_market_price()
     for symbol in market_price.keys():
-        buysell(exchange, symbol, wait_time)
-    exchange(exchange, wait_time)
+        buysell(exchange, symbol, rand)
+    #converting(exchange, rand)
+
+    time.sleep(1)
 
     # At end of loop, we want to:
     # 1. clear all of our dictionaries
@@ -182,10 +203,11 @@ def run_bot():
     write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
     hello_from_exchange = read_from_exchange(exchange)
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+
     start_time = time.time()
     wait_time = 0
     while wait_time <=300:
-        wait_time = start_time - time.time()
+        wait_time = time.time() - start_time
         main(wait_time, exchange)
         # Add logger for parsing server messges for other people's trades
 
