@@ -43,7 +43,9 @@ def read_from_exchange(exchange):
 
 # sub functions and global vars
 
-attempted_positions = {}
+attempted_buy_positions = {}
+
+attempted_sell_positions = {}
 
 
 our_current_positions = {}
@@ -53,8 +55,23 @@ market_positions = {}
 
 
 
+def buy_position(exchange, orderId, symbol, price, size):
+    write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "BUY", "price": price, "size": size})
+    replyMessage = read_from_exchange(exchange)
+    if replyMessage["type"] != "reject":
+        attempted_buy_positions[orderId] = [symbol, price, size]
+        return True
+    else:
+        return False
 
-
+def sell_position(exchange, orderId, symbol, price, size):
+    write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
+    replyMessage = read_from_exchange(exchange)
+    if replyMessage["type"] != "reject":
+        attempted_sell_positions[orderId] = [symbol, price, size]
+        return True
+    else:
+        return False
 
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
@@ -71,9 +88,16 @@ def main():
 
     messages = read_from_exchange(exchange)
 
+    # At end of loop, we want to:
+    # 1. clear all of our dictionaries
+    # 2. reset order id numbers
+    # 3. reconnect to server using linux command
+
 def run_bot():
     while True:
         main()
+        # Add logger for parsing server messges for other people's trades
+
 
 
 if __name__ == "__main__":
