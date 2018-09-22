@@ -10,11 +10,10 @@ from __future__ import print_function
 import sys
 import socket
 import json
-import pandas as pd
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
-team_name="TEAMBIGDATA"
+team_name = "TEAMBIGDATA"
 # This variable dictates whether or not the bot is connecting to the prod
 # or test exchange. Be careful with this switch!
 test_mode = True
@@ -24,10 +23,11 @@ test_mode = True
 # 1 is slower
 # 2 is empty
 test_exchange_index = 0
-prod_exchange_hostname="production"
+prod_exchange_hostname = "production"
 
-port=25000 + (test_exchange_index if test_mode else 0)
+port = 25000 + (test_exchange_index if test_mode else 0)
 exchange_hostname = "test-exch-" + team_name if test_mode else prod_exchange_hostname
+
 
 # ~~~~~============== NETWORKING CODE ==============~~~~~
 def connect():
@@ -35,12 +35,15 @@ def connect():
     s.connect((exchange_hostname, port))
     return s.makefile('rw', 1)
 
+
 def write_to_exchange(exchange, obj):
     json.dump(obj, exchange)
     exchange.write("\n")
 
+
 def read_from_exchange(exchange):
     return json.loads(exchange.readline())
+
 
 # sub functions and global vars
 
@@ -52,57 +55,28 @@ our_current_positions = {}
 
 market_positions = {}
 
-
-
-
-def buy_position(exchange, orderId, symbol, price, size):
-    write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "BUY", "price": price, "size": size})
-    replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_buy_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
-
-def sell_position(exchange, orderId, symbol, price, size):
-    write_to_exchange(exchange, {"type": "add", "order_id": orderId, "symbol": symbol, "dir": "SELL", "price": price, "size": size})
-    replyMessage = read_from_exchange(exchange)
-    if replyMessage["type"] != "reject":
-        attempted_sell_positions[orderId] = [symbol, price, size]
-        return True
-    else:
-        return False
-
-
-def fair_price_approx(symbol, )
-    pass
+message_log = []
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
 def main():
     exchange = connect()
-    write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
-    hello_from_exchange = read_from_exchange(exchange)
     # A common mistake people make is to call write_to_exchange() > 1
     # time for every read_from_exchange() response.
     # Since many write messages generate marketdata, this will cause an
     # exponential explosion in pending messages. Please, don't do that!
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 
-    # We need to read the messages and do stuff accordingly
 
     messages = read_from_exchange(exchange)
     print(messages)
-
-    messages = read_from_exchange(exchange)
-    print("string messages: ")
-    print(messages)
-
+    message_log.append(messages)
 
     # At end of loop, we want to:
     # 1. clear all of our dictionaries
     # 2. reset order id numbers
     # 3. reconnect to server using linux command
+
 
 def run_bot():
     while True:
@@ -110,8 +84,5 @@ def run_bot():
         # Add logger for parsing server messges for other people's trades
 
 
-
 if __name__ == "__main__":
     run_bot()
-
-    
