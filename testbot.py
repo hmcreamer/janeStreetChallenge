@@ -154,6 +154,7 @@ def buysell(exchange, symbol, wait_time):
             buy_position(exchange, wait_time*2, symbol, buy[0], to_buy)
             our_current_positions[symbol] += to_buy
 
+
 def converting(exchange, wait_time):
     if ((market_price["BABA"] * our_current_positions["BABA"]) + 10 > (market_price["BABZ"] * our_current_positions["BABA"])):
         convert_position(exchange, wait_time, "BABA", our_current_positions["BABA"], "SELL")
