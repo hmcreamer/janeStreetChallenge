@@ -10,7 +10,6 @@ from __future__ import print_function
 import sys
 import socket
 import json
-import pandas as pd
 import time
 
 
@@ -81,15 +80,11 @@ def fair_price_approx(symbol):
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
-def main():
-    exchange = connect()
-    write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
-    hello_from_exchange = read_from_exchange(exchange)
+def main(wait_time, exchange):
     # A common mistake people make is to call write_to_exchange() > 1
     # time for every read_from_exchange() response.
     # Since many write messages generate marketdata, this will cause an
     # exponential explosion in pending messages. Please, don't do that!
-    print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 
     # We need to read the messages and do stuff accordingly
 
@@ -107,11 +102,18 @@ def main():
     # 3. reconnect to server using linux command
 
 def run_bot():
-    waitTime = 0
-    while waitTime <=300:
-        time.sleep(1)
-        main()
+    exchange = connect()
+    write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
+    hello_from_exchange = read_from_exchange(exchange)
+    print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+    start_time = time.time()
+    wait_time = 0
+    while wait_time <=300:
+        wait_time = start_time - time.time()
+        main(wait_time, exchange)
         # Add logger for parsing server messges for other people's trades
+
+
 
 
 
