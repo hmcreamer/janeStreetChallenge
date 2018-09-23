@@ -131,7 +131,7 @@ def update_market_price():
 
 def buysell(exchange, symbol, wait_time):
     for sell in book[symbol]["sell"]:
-        if (sell > 1.5 + market_price[symbol]):
+        if (sell > market_price[symbol] + 1.1):
             print("sell")
             amount_wanted = sell[1]
             amount_possible = our_current_positions[symbol]
@@ -143,7 +143,7 @@ def buysell(exchange, symbol, wait_time):
             our_current_positions[symbol] -= to_sell
 
     for buy in book[symbol]["buy"]:
-        if (buy > market_price[symbol]):
+        if (buy > market_price[symbol] - 1.1):
             print("buy")
             amount_offered = buy[1]
             amount_possible = 100 - our_current_positions[symbol]
@@ -152,8 +152,11 @@ def buysell(exchange, symbol, wait_time):
             else:
                 to_buy = amount_possible
 
-            buy_position(exchange, wait_time*2, symbol, buy[0], to_buy)
+            buy_position(exchange, wait_time*2, symbol, buy[0] + 1, to_buy)
             our_current_positions[symbol] += to_buy
+
+        if ((symbol == "GOOG") & (our_current_positions["GOOG"] >= 50)):
+            buy_position(exchange, wait_time * 2, symbol, buy[0], to_buy)
 
 
 
